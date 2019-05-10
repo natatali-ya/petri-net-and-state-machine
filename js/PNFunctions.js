@@ -95,7 +95,9 @@ function addTransition(key, x, y, name) {
     newTransition.y = y;
     newTransition.key = key;
     newTransition.caption = drawKey(key, x, y);
-    newTransition.name = drawName(name, x, y);;
+    if (name) {
+        newTransition.name = drawName(name, x, y);
+    }
 
     // transform coordinates
     newTransition.dx = 0; 
@@ -121,7 +123,23 @@ function placeClick(e) {
     }
     var x = this.x;
     var y = this.y;
-    var selectionDash = paper.rect(x - PLACE_RADIUS, y - PLACE_RADIUS, 2 * PLACE_RADIUS, 2 * PLACE_RADIUS).attr({ "stroke": "#808080", "stroke-width": "1", "stroke-dasharray": "- "}).toBack();
+
+    var selectionDash;
+    var selectionAttr = { "stroke": "#808080", "stroke-dasharray": "- "};
+    switch (this.type) {
+        case "circle":
+            selectionDash = paper.rect(x - PLACE_RADIUS, y - PLACE_RADIUS, 2 * PLACE_RADIUS, 2 * PLACE_RADIUS).attr(selectionAttr).toBack();
+            break;
+        case "rect":
+            if (this.name) {
+                selectionDash = paper.rect(x - TRANSITION_WIDTH / 2 - 5 , y - TRANSITION_HEIGHT /2 - 20, TRANSITION_WIDTH + 10, TRANSITION_HEIGHT + 40).attr(selectionAttr).toBack();
+            } else {
+                selectionDash = paper.rect(x - TRANSITION_WIDTH / 2 - 5 , y - TRANSITION_HEIGHT /2 - 5, TRANSITION_WIDTH + 10, TRANSITION_HEIGHT + 25).attr(selectionAttr).toBack();
+            }
+            break;
+        case "arc":
+            break;
+    }
     selected = paper.set();
     selected.push(selectionDash);
     selected.node = this;
@@ -146,13 +164,14 @@ function dragOnMove(dx, dy) {
     this.transform(this.currentTransform + "t" + dx + ',' + dy); // moving from Raphael documentation
     this.caption.remove();
     this.caption = drawKey(this.key, this.x + dx, this.y + dy); // redraw key
-    if (this.tokens && this.tokens.length) {
+    if (this.tokens && this.tokens.length) { // redraw tikens for place
         removeAllTokens(this);
         drawTokens(this.tokens, this.x + dx, this.y + dy);
     }
-    if (this.name) {
-        removeName(this);
-        this.name = drawName(this.name, this.x + dx, this.y + dy);
+    if (this.name) { // redraw name for transition
+        var name = this.name.attrs.text;
+        this.name.remove();
+        this.name = drawName(name, this.x + dx, this.y + dy);
     }
 }
 
@@ -240,17 +259,6 @@ function removeAllTokens(place) {
             place.tokens[i].remove();
         }    
     }
-}
-
-/** 
-* -------------------------------
-*       WORKING WITH NAME
-* -------------------------------
-*/
-
-function removeName(transition) {
-    if (!selected) return;
-    transition.name = "";
 }
 
 /** 
