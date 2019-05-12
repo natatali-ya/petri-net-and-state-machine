@@ -60,9 +60,11 @@ function removeSelected() {
             if (node.count > 1) {
                 node.text.remove();
                 node.count --;
-                node.text = drawCount(node.count, node.from.x, node.from.y, node.to.x, node.to.y, node.from.type);
+                if (node.count > 1) {
+                    node.text = drawCount(node.count, node.from.x, node.from.y, node.to.x, node.to.y, node.from.type);
+                }
             } else {
-                removeArrow(node.keys[0], node,keys[1]);
+                removeArrow(node.keys[0], node.keys[1]);
             }
             break;
     }
@@ -96,7 +98,7 @@ function removeNode(node) {
  */
 function removeArrow(key1, key2) {
     for (var i = arrows.length - 1; i >= 0; i--) {
-        if((arrows[i].from.key == key1 && arrows[i].to.key == key2) || (arrows[i].from.key == key2 && arrows[i].to.key == key1)) {
+        if((arrows[i].path.from.key == key1 && arrows[i].path.to.key == key2) || (arrows[i].path.from.key == key2 && arrows[i].path.to.key == key1)) {
             arrows[i].path.remove();
             arrows.splice(i, 1);
         }
@@ -184,22 +186,22 @@ function addArrow(node1, node2) {
     if (node1.key.substr(0, 1) != node2.key.substr(0, 1)) { // nodes of different types 
         arrow = arrowExists(node1.key, node2.key);
         if (!isEmpty(arrow)) {
-            arrow.count ++;
-            if (arrow.text) {
-                arrow.text.remove();
+            arrow.path.count ++;
+            if (arrow.path.text) {
+                arrow.path.text.remove();
             }
             var xTo = arrow.path.attrs.path[1][1];
             var yTo = arrow.path.attrs.path[1][2];
             var xFrom = arrow.path.attrs.path[0][1];
             var yFrom = arrow.path.attrs.path[0][2];
-            arrow.text = drawCount(arrow.count, xFrom, yFrom, xTo, yTo, node1.type);
+            arrow.path.text = drawCount(arrow.path.count, xFrom, yFrom, xTo, yTo, node1.type);
         } else {         
             if (!((Math.abs(node1.x - node2.x) <= 2*PLACE_RADIUS + 10) && (Math.abs(node1.y - node2.y) <= 2*PLACE_RADIUS + 10))) {
-                arrow.count = 1;
-                arrow.from = node1;
-                arrow.to = node2;
                 arrow.path = addArrowPath(node1.x, node1.y, node2.x, node2.y, node1.type);
-                arrow.keys = [node1.key, node2.key];
+                arrow.path.count = 1;
+                arrow.path.from = node1;
+                arrow.path.to = node2;
+                arrow.path.keys = [node1.key, node2.key];
                 arrow.path.click(nodeClick);
                 arrows.push(arrow);
             } 
@@ -252,7 +254,7 @@ function addArrowPath(xFrom, yFrom, xTo, yTo, startType) {
 function arrowExists(key1, key2) {
     var arr = {};
     arrows.forEach(function(arrow) {
-        if (arrow.from.key == key1 && arrow.to.key == key2) {
+        if (arrow.path.from.key == key1 && arrow.path.to.key == key2) {
             arr = arrow;
         }
     });
@@ -547,33 +549,53 @@ function drawCount(count, xFrom, yFrom, xTo, yTo, startType) {
 
 function redrawArrows(node, x, y) {
     arrows.forEach(function(arrow, index) {
-        if (arrow.from.key == node.key) {
+        if (arrow.path.from.key == node.key) {
+            var arrowTo = arrow.path.to;
+            var arrowFrom = arrow.path.from;
+            var arrowCount = arrow.path.count;
+            var arrowKeys = arrow.path.keys;
+            if (arrow.path.text) {
+                arrow.path.text.remove();
+            }
             arrow.path.remove();
-            arrow.path = addArrowPath(x, y, arrow.to.x, arrow.to.y, node.type);
-            if ((Math.abs(x - arrow.to.x) <= 2*PLACE_RADIUS + 10) && (Math.abs(y - arrow.to.y) <= 2*PLACE_RADIUS + 10)) {
+            arrow.path = addArrowPath(x, y, arrowTo.x, arrowTo.y, node.type);
+            arrow.path.from = arrowFrom;
+            arrow.path.to = arrowTo;
+            arrow.path.count = arrowCount;
+            arrow.path.keys = arrowKeys;
+            if ((Math.abs(x - arrowTo.x) <= 2*PLACE_RADIUS + 10) && (Math.abs(y - arrowTo.y) <= 2*PLACE_RADIUS + 10)) {
                 if (arrow.text) {
-                    arrow.text.remove();
+                    //arrow.text.remove();
                 }
-            } else if (arrow.count > 1) {
-                arrow.text.remove();
+            } else if (arrowCount > 1) {
                 var xTo = arrow.path.attrs.path[1][1];
                 var yTo = arrow.path.attrs.path[1][2];
-                arrow.text = drawCount(arrow.count, x, y, xTo, yTo, node.type);
+                arrow.path.text = drawCount(arrowCount, x, y, xTo, yTo, node.type);
             }
             arrow.path.click(nodeClick);
         }
-        else if (arrow.to.key == node.key) {
+        else if (arrow.path.to.key == node.key) {
+            var arrowTo = arrow.path.to;
+            var arrowFrom = arrow.path.from;
+            var arrowCount = arrow.path.count;
+            var arrowKeys = arrow.path.keys;
+            if (arrow.path.text) {
+                arrow.path.text.remove();
+            }
             arrow.path.remove();
-            arrow.path = addArrowPath(arrow.from.x, arrow.from.y, x, y, arrow.from.type);
-            if ((Math.abs(arrow.from.x - x) <= 2*PLACE_RADIUS + 10) && (Math.abs(arrow.from.y - y) <= 2*PLACE_RADIUS + 10)) {
-                if (arrow.text) {
-                    arrow.text.remove();
+            arrow.path = addArrowPath(arrowFrom.x, arrowFrom.y, x, y, arrowFrom.type);
+            arrow.path.from = arrowFrom;
+            arrow.path.to = arrowTo;
+            arrow.path.count = arrowCount;
+            arrow.path.keys = arrowKeys;
+            if ((Math.abs(arrowFrom.x - x) <= 2*PLACE_RADIUS + 10) && (Math.abs(arrowFrom.y - y) <= 2*PLACE_RADIUS + 10)) {
+                if (arrow.path.text) {
+                    //arrow.path.text.remove();
                 }
-            } else if (arrow.count > 1) {
-                arrow.text.remove();
+            } else if (arrowCount > 1) {
                 var xFrom = arrow.path.attrs.path[0][1];
                 var yFrom = arrow.path.attrs.path[0][2];
-                arrow.text = drawCount(arrow.count, xFrom, yFrom, x, y, arrow.from.type);
+                arrow.path.text = drawCount(arrowCount, xFrom, yFrom, x, y, arrow.path.from.type);
             }
             arrow.path.click(nodeClick);
         }
