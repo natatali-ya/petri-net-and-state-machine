@@ -21,7 +21,7 @@ function nextIndex(nodes) {
 /**
  * Clear all information about old Petri net
  */
-function ResetPetriNet() {
+function resetPetriNet() {
     places = {};
     transitions = {};
     arrows = [];
@@ -172,6 +172,7 @@ function addTransition(key, x, y, name) {
     newTransition.x = x;
     newTransition.y = y;
     newTransition.key = key;
+    newTransition.tname = name;
     newTransition.caption = drawKey(key, x, y);
     if (name) {
         newTransition.name = drawName(name, x, y);
@@ -375,14 +376,13 @@ function dragOnMove(dx, dy, x, y, e) {
         this.transform(this.currentTransform + "t" + dx + ',' + dy); // moving from Raphael documentation
         this.caption.remove();
         this.caption = drawKey(this.key, this.x + dx, this.y + dy); // redraw key
-        if (this.tokens && this.tokens.length) { // redraw tikens for place
+        if (this.tokens && this.tokens.length) { // redraw tokens for place
             removeAllTokens(this);
             drawTokens(this.tokens, this.x + dx, this.y + dy);
         }
         if (this.name) { // redraw name for transition
-            var name = this.name.attrs.text;
             this.name.remove();
-            this.name = drawName(name, this.x + dx, this.y + dy);
+            this.name = drawName(this.tname, this.x + dx, this.y + dy);
         }
         redrawArrows(this, this.x + dx, this.y + dy);
     } else {
