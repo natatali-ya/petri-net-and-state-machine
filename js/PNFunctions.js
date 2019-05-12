@@ -76,17 +76,21 @@ function removeSelected() {
  * @param {Object} node - deleted element
  */
 function removeNode(node) {
+    var key = selected.node.key;
+    for (var i = arrows.length - 1; i >= 0; i--) {
+        if (arrows[i].path.from.key === key || arrows[i].path.to.key === key) {
+            if (arrows[i].path.text) {
+                arrows[i].path.text.remove();
+            }
+            arrows[i].path.remove();
+            arrows.splice(i, 1);
+        }
+    }
     if(node.caption) {
         node.caption.remove();
     }
     if (node.name) {
         node.name.remove();
-    }
-    if (node.text) {
-        node.text.remove();
-    }
-    if (node.path) {
-        node.path.remove();
     }
     node.remove();
 }
