@@ -6,6 +6,7 @@
         <script src="lib/raphael.min.js"></script>
         <script src="js/PNFunctions.js"></script>
         <script src="js/fileWorking.js"></script>
+        <script src="js/common.js"></script>
     </head>
     <body>
         <div id="wrapper">
@@ -23,7 +24,7 @@
             <div class="row ml-1 pt-1">
                 <div>
                     <button class="d-block col btn btn-outline-info mb-1" id="btnOpen">Open</button>
-                    <input id="fileinput" type="file" style="display:none;" onchange="processNewFile()"/>
+                    <input id="fileinput" type="file" style="display:none;" onchange="processNewFile('PN')"/>
                     <button class="d-block col btn btn-outline-info mb-1" id="btnSave">Save</button>
 
                     <!-- <button class="d-block col btn btn-outline-danger mb-1" id="btnRun">Run net</button>

@@ -8,8 +8,13 @@
   * Saving petri net to file
   * @param {String} file - file's name to save
   */
-function saveToFile(file) {
-    var text = serializePnet(places, transitions, arrows);
+function saveToFile(file, sign) {
+    var text;
+    if (sign === "SM") {
+        text = serializeSMachine(startState, usualStates, finalStates, arrows);
+    } else if (sign === "PN") {
+        text = serializePnet(places, transitions, arrows);
+    }
     downloadToFile(file, text);
 }
 
@@ -34,6 +39,27 @@ function serializePnet(places, transitions, arrows) {
         pNet.arrows.push(arrow.from.key + "," + arrow.to.key + "," + arrow.count);
     });
     return JSON.stringify(pNet);
+}
+
+function serializeSMachine(startState, usualStates, finalStates, arrows) {
+    var sMachine = { startState:[], usualStates:[], finalStates:[], arrows:[] };
+    Object.keys(startState).forEach(function(key) {
+        var start = startState[key].options;
+        sMachine.startState.push(start.key + "," + start.x + "," + start.y + "," + start.name);
+    });
+    Object.keys(usualStates).forEach(function(key) {
+        var state = usualStates[key].options;
+        sMachine.usualStates.push(state.key + "," + state.x + "," + state.y + "," + state.name);
+    });
+    Object.keys(finalStates).forEach(function(key) {
+        var state = finalStates[key].options;
+        sMachine.finalStates.push(state.key + "," + state.x + "," + state.y + "," + state.name);
+    });
+    arrows.forEach(function(item) {
+        var arrow = item.path;
+        sMachine.arrows.push(arrow.from.key + "," + arrow.to.key);
+    });
+    return JSON.stringify(sMachine);
 }
 
 /**
@@ -80,15 +106,20 @@ function createFile(text) {
  /**
   * Get new file and handles it
   */
-function processNewFile() {
+function processNewFile(sign) {
     var file = document.getElementById("fileinput").files[0];;
     if (!file) {
         return;
     }
     readFromFile(file, function(e) {
         try {
-            var pNet = JSON.parse(e.target.result);
-            deserializePnet(pNet);
+            var scheme = JSON.parse(e.target.result);
+            if (sign === "PN") {
+                deserializePnet(scheme);
+            } else if (sign === "SM") {
+                deserializeSMachine(scheme);
+            }
+            
         }
         catch(err) {
             console.log(err.message);
@@ -144,4 +175,26 @@ function getByKey(key) {
     if (key.charAt(0) == "t")
         return transitions[key];
     return null;
+}
+
+function deserializeSMachine(sMachine) {
+    paper.clear();
+    resetStateMachine();
+    sMachine.startState.forEach(function(item) {
+        var arr = item.split(",");
+        addStartState(arr[0], +arr[1], +arr[2], +arr[3]);
+    });
+    sMachine.usualStates.forEach(function(item) {
+        var arr = item.split(",");
+        addUsualState(arr[0], +arr[1], +arr[2], arr[3]);
+    });
+    sMachine.finalStates.forEach(function(item) {
+        var arr = item.split(",");
+        addFinalState(arr[0], +arr[1], +arr[2], arr[3]);
+    });
+    sMachine.arrows.forEach(function(item) {
+        var arr = item.split(",");
+        addArrow(getByKey(arr[0]), getByKey(arr[1]));
+    });
+    console.log(sMachine);
 }

@@ -1,5 +1,5 @@
 /**
- * GLOBAL INITIALIZATION AREA
+ * GLOBAL INITIALIZATION AREA STATE MACHINE
  */
 var canvas = document.getElementById("canvas");
 var width = window.innerWidth;
@@ -9,8 +9,9 @@ var height = window.innerHeight;
 var paper = new Raphael("canvas", width, height);
 
 // Main elements of the Petri net
-var places = {};
-var transitions = {};
+var startState = {};
+var usualStates = {};
+var finalStates = {};
 var arrows = [];
 var selected = null;
 
@@ -20,12 +21,11 @@ var tempArrowActive = false;
 var textFile = null; // need to manually revoke the object URL to avoid memory leaks
 
 // constants
-var PLACE_RADIUS = 30;
-var TOKEN_RADIUS = 5;
-var TRANSITION_HEIGHT = 60;
-var TRANSITION_WIDTH = 20;
+var STATE_RADIUS = 30;
+var STATE_WIDTH = 25;
 var OFFSET = 5;
-var SELECTION_ARROW_HEIGHT = 8;
+var KEY_START = "q0";
+
 
 /**
  * Clicking outside the element. Clearing selection
@@ -58,47 +58,33 @@ btnOpen.addEventListener("click", function() {
  * Handler for clicking the Save button
  */
 btnSave.addEventListener("click", function() {
-    saveToFile("petriNet.txt", "PN");
-});
-
-// btnRun.addEventListener("click", function() {
-//     //TODO
-// });
-
-// btnStop.addEventListener("click", function() {
-//     //TODO
-// });
-
-/**
- * Handler for clicking the Add place button
- */
-btnAddPlace.addEventListener("click", function() {
-    addPlace("p" + nextIndex(places), 50, 50, 0);
+    saveToFile("stateMachine.txt", "SM");
 });
 
 /**
- * Handler for clicking the Add transition
+ * Handler for clicking the Add state button
  */
-btnAddTransition.addEventListener("click", function() {
-    var name = document.getElementById("transitionName").value;
-    addTransition("t" + nextIndex(transitions), 50, 50, name);
-});
-
-/**
- * Handler for clicking the Add token button
- */
-btnAddToken.addEventListener("click", function() {
-    if (selected) {
-        addToken(places[selected.node.key]);
-    }
-});
-
-/**
- * Handler for clicking the Remove token button
- */
-btnRemToken.addEventListener("click", function() {
-    if (selected) {
-        removeToken(places[selected.node.key]);
+btnAddState.addEventListener("click", function() {
+    var stateName = document.getElementById("stateName").value;
+    var start = document.getElementById("startState");
+    var usual = document.getElementById("usualState");
+    var final = document.getElementById("finalState");
+    if (start.checked) {
+        if (!isEmpty(startState)) {
+            var start = startState[KEY_START];
+            start.options.captionKey.remove();
+            if (start.options.name) {
+                start.options.captionName.remove();
+            }
+            start.remove();
+            delete start;
+        }
+        addStartState(KEY_START, 100, 100, stateName);
+    } else if (usual.checked) {
+        addUsualState("q" + (nextIndex(usualStates)), 50, 50, stateName);
+        
+    } else if (final.checked) {
+        addFinalState("f" + nextIndex(finalStates), 50, 50, stateName);
     }
 });
 
@@ -111,9 +97,9 @@ btnRemove.addEventListener("click", function() {
 
 /**
  * Handler for clicking the Clear all button
- * Clear canvas and old information about Petri net
+ * Clear canvas and old information about State Machine
  */
 btnClearAll.addEventListener("click", function() {
-    resetPetriNet();
+    resetStateMachine();
     paper.clear();
 });

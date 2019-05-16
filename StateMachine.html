@@ -1,19 +1,58 @@
 <html>
     <head>
         <title>State machine</title>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <script src="lib/jquery-3.4.1.min.js"></script>
+        <script src="lib/raphael.min.js"></script>
+        <script src="lib/jquery-3.2.1.min.js"></script>
+        <script src="lib/bootstrap.min.js"></script>
+        <link rel="stylesheet" href="css/bootstrap.min.css" />
+        <link rel="stylesheet" href="css/common.css" />
+        <script src="js/common.js"></script>
+        <script src="js/SM/SMFunctions.js"></script>
+        <script src="js/fileWorking.js"></script>
     </head>
     <body>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <a class="navbar-brand" href="index.html">State machine & Perti net</a>
-            <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link" href="About.html">About</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="Contact.html">Contacts</a>
-                </li>
-            </ul>
-        </nav>
+        <div id="wrapper">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                <a class="navbar-brand" href="index.html"><b>State machine</b> & Perti net</a>
+                <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="About.html">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="Contact.html">Contacts</a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="row ml-1 pt-1">
+                <div>
+                    <button class="d-block col btn btn-outline-info mb-1" id="btnOpen">Open</button>
+                    <input id="fileinput" type="file" style="display:none;" onchange="processNewFile('SM')"/>
+                    <button class="d-block col btn btn-outline-info mb-1" id="btnSave">Save</button>
+
+                    <button class="d-block col btn btn-outline-success mb-1" id="btnAddState">Add state</button>
+                    <div id="stateType" class="btn-group btn-group-toggle mb-1" data-toggle="buttons">
+                        <label class="btn btn-outline-success active">
+                            <input type="radio" name="options" id="startState" checked value="Start">Start
+                        </label>
+                        <label class="btn btn-outline-success">
+                            <input type="radio" name="options" id="usualState">Usual
+                        </label>
+                        <label class="btn btn-outline-success">
+                            <input type="radio" name="options" id="finalState">Final
+                        </label>
+                    </div>
+                    <input type="text" class="form-control-plaintext border rounded mb-3 text-center" id="stateName" placeholder="Enter state name">
+                    <div class="alert alert-success mb-1" role="alert">For next transition:</div>
+                    <input type="text" class="form-control-plaintext border rounded mb-1 text-center" id="transitionName" placeholder="Enter transition name">
+
+                    <button class="d-block col btn btn-outline-warning mb-1" id="btnRemove">Remove</button>
+                    <button class="d-block col btn btn-outline-warning mb-1" id="btnClearAll">Clear all</button>
+                </div>
+                
+                <div class="col-10" id="canvas"></div>
+            </div>
+        </div>
     </body>
+    <script src="js/SM/hendlers.js"></script>
 </html>
