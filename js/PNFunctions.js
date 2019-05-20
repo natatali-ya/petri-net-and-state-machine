@@ -288,7 +288,6 @@ function nodeClick(e) {
             var x2 = path[1][1];
             var y2 = path[1][2];
             var width = Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
-            //var deg  = Math.atan2(Math.tan(y1 - y2, x1 - x2)) * 180 / Math.PI;
             var deg  = Math.atan2(Math.abs(y1 - y2), Math.abs(x1 - x2)) * 180 / Math.PI;
 
             if (x1 < x2) {

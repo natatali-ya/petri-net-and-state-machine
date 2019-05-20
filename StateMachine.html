@@ -24,7 +24,7 @@
                     </li>
                 </ul>
             </nav>
-            <div class="row ml-1 pt-1">
+            <div class="row ml-1 pt-1" style="position: relative;">
                 <div>
                     <button class="d-block col btn btn-outline-info mb-1" id="btnOpen">Open</button>
                     <input id="fileinput" type="file" style="display:none;" onchange="processNewFile('SM')"/>
@@ -49,8 +49,36 @@
                     <button class="d-block col btn btn-outline-warning mb-1" id="btnRemove">Remove</button>
                     <button class="d-block col btn btn-outline-warning mb-1" id="btnClearAll">Clear all</button>
                 </div>
-                
                 <div class="col-10" id="canvas"></div>
+                <div id="toast-start" class="toast ml-auto" role="alert" data-delay="3000" data-autohide="true" style="position: absolute; top: 10; right: 40;">
+                    <div class="toast-header bg-danger">
+                        <strong class="mr-auto text-white">Attention!</strong>
+                    </div>
+                    <div class="toast-body">
+                        Start state alreay exists!
+                    </div>
+                </div>
+                <div id="toast-arrow" class="toast ml-auto" role="alert" data-delay="3000" data-autohide="true" style="position: absolute; top: 10; right: 40;">
+                    <div class="toast-header bg-danger">
+                        <strong class="mr-auto text-white">Attention!</strong>
+                    </div>
+                    <div class="toast-body">
+                        Arrow between this states alreay exists!
+                    </div>
+                </div>
+                <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="mi-modal">
+                    <div class="modal-dialog modal-sm">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title" id="myModalLabel">Start state will be final?</h4>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" id="modal-btn-yes">Yes</button>
+                                <button type="button" class="btn btn-warning" id="modal-btn-no">No</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </body>

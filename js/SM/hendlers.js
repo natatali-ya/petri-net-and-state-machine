@@ -24,7 +24,11 @@ var textFile = null; // need to manually revoke the object URL to avoid memory l
 var STATE_RADIUS = 30;
 var STATE_WIDTH = 25;
 var OFFSET = 5;
+var INCLINE_X = 55; // for arc for the state in itself
+var INCLINE_Y = 80;
 var KEY_START = "q0";
+var SELECTION_ARROW_HEIGHT = 8;
+var DOUBLE_OFFSET = 6;
 
 
 /**
@@ -71,15 +75,28 @@ btnAddState.addEventListener("click", function() {
     var final = document.getElementById("finalState");
     if (start.checked) {
         if (!isEmpty(startState)) {
-            var start = startState[KEY_START];
-            start.options.captionKey.remove();
-            if (start.options.name) {
-                start.options.captionName.remove();
-            }
-            start.remove();
-            delete start;
+            $('#toast-start').toast('show');
+        } else {
+            $("#mi-modal").modal('show');
+            var modalConfirm = function(callback){              
+                $("#modal-btn-yes").on("click", function() {
+                  callback(true);
+                  $("#mi-modal").modal('hide');
+                });
+                
+                $("#modal-btn-no").on("click", function() {
+                  callback(false);
+                  $("#mi-modal").modal('hide');
+                });
+            };
+            modalConfirm(function(confirm) {
+                if (confirm) {
+                  addStartState(KEY_START, 100, 100, stateName, true);
+                } else {
+                  addStartState(KEY_START, 100, 100, stateName, false);
+                }
+            });
         }
-        addStartState(KEY_START, 100, 100, stateName);
     } else if (usual.checked) {
         addUsualState("q" + (nextIndex(usualStates)), 50, 50, stateName);
         
