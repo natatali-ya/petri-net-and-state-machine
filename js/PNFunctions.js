@@ -115,7 +115,7 @@ function addPlace(key, x, y, tokens) {
     newPlace.y = y;
     newPlace.key = key;
     newPlace.tokens = new Array(tokens);
-    newPlace.caption = drawKey(key, x, y);
+    newPlace.caption = drawKeyPN(key, x, y);
 
     // transform coordinates
     newPlace.dx = 0; 
@@ -149,9 +149,9 @@ function addTransition(key, x, y, name) {
     newTransition.y = y;
     newTransition.key = key;
     newTransition.tname = name;
-    newTransition.caption = drawKey(key, x, y);
+    newTransition.caption = drawKeyPN(key, x, y);
     if (name) {
-        newTransition.name = drawName(name, x, y);
+        newTransition.name = drawNamePN(name, x, y);
     }
 
     // transform coordinates
@@ -165,7 +165,7 @@ function addTransition(key, x, y, name) {
 function addArrow(node1, node2) {
     var arrow;
     if (node1.key.substr(0, 1) != node2.key.substr(0, 1)) { // nodes of different types 
-        arrow = arrowExists(node1.key, node2.key);
+        arrow = arrowExistsPN(node1.key, node2.key);
         if (!isEmpty(arrow)) {
             arrow.path.count ++;
             if (arrow.path.text) {
@@ -232,7 +232,7 @@ function addArrowPath(xFrom, yFrom, xTo, yTo, startType) {
  * @param {String} key1 - key from
  * @param {String} key2 - key to
  */
-function arrowExists(key1, key2) {
+function arrowExistsPN(key1, key2) {
     var arr = {};
     arrows.forEach(function(arrow) {
         if (arrow.path.from.key == key1 && arrow.path.to.key == key2) {
@@ -339,14 +339,14 @@ function dragOnMove(dx, dy, x, y, e) {
         this.dy = dy;
         this.transform(this.currentTransform + "t" + dx + ',' + dy); // moving from Raphael documentation
         this.caption.remove();
-        this.caption = drawKey(this.key, this.x + dx, this.y + dy); // redraw key
+        this.caption = drawKeyPN(this.key, this.x + dx, this.y + dy); // redraw key
         if (this.tokens && this.tokens.length) { // redraw tokens for place
             removeAllTokens(this);
             drawTokens(this.tokens, this.x + dx, this.y + dy);
         }
         if (this.name) { // redraw name for transition
             this.name.remove();
-            this.name = drawName(this.tname, this.x + dx, this.y + dy);
+            this.name = drawNamePN(this.tname, this.x + dx, this.y + dy);
         }
         redrawArrows(this, this.x + dx, this.y + dy);
     } else {
@@ -458,7 +458,7 @@ function removeAllTokens(place) {
  * @param {Number} x - x coordinate
  * @param {Number} y - y coordinate
  */
-function drawKey(text, x, y) {
+function drawKeyPN(text, x, y) {
     return paper.text(x, y + PLACE_RADIUS + 10, text).attr({
         fill: "blue",
         "font-size": 14,
@@ -472,7 +472,7 @@ function drawKey(text, x, y) {
  * @param {Number} x - x coordinate
  * @param {Number} y - y coordinte
  */
-function drawName(text, x, y) {
+function drawNamePN(text, x, y) {
     return paper.text(x, y - TRANSITION_HEIGHT / 2 - 10, text).attr({
         fill: "blue",
         "font-size": 14,

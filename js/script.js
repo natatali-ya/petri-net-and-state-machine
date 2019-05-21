@@ -117,3 +117,12 @@ btnClearAll.addEventListener("click", function() {
     resetPetriNet();
     paper.clear();
 });
+
+function loadPage() {
+    var obj = localStorage.getItem("object");
+    console.log(obj);
+    if (obj) {
+        deserializePnet(JSON.parse(obj));
+    }
+    localStorage.clear();
+}

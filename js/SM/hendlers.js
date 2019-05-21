@@ -120,3 +120,14 @@ btnClearAll.addEventListener("click", function() {
     resetStateMachine();
     paper.clear();
 });
+
+btnConvertToPN.addEventListener("click", function() {
+    localStorage.clear();
+    var pNet = covertSmToPn(startState, usualStates, finalStates, arrows);
+    console.log(pNet);
+
+    // Запишем в localStorage с ключём object
+    localStorage.setItem("object", pNet);
+    window.open('PetriNet.html');
+    //win.addEventListener('load', deserializePnet(pNet), false);
+});

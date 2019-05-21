@@ -45,7 +45,7 @@ function serializeSMachine(startState, usualStates, finalStates, arrows) {
     var sMachine = { startState:[], usualStates:[], finalStates:[], arrows:[] };
     Object.keys(startState).forEach(function(key) {
         var start = startState[key].options;
-        sMachine.startState.push(start.key + "," + start.x + "," + start.y + "," + start.name);
+        sMachine.startState.push(start.key + "," + start.x + "," + start.y + "," + start.name + "," + start.isFinal);
     });
     Object.keys(usualStates).forEach(function(key) {
         var state = usualStates[key].options;
@@ -57,7 +57,7 @@ function serializeSMachine(startState, usualStates, finalStates, arrows) {
     });
     arrows.forEach(function(item) {
         var arrow = item.path;
-        sMachine.arrows.push(arrow.from.key + "," + arrow.to.key);
+        sMachine.arrows.push(arrow.from.options.key + "," + arrow.to.options.key + "," + arrow.text);
     });
     return JSON.stringify(sMachine);
 }
@@ -107,7 +107,7 @@ function createFile(text) {
   * Get new file and handles it
   */
 function processNewFile(sign) {
-    var file = document.getElementById("fileinput").files[0];;
+    var file = document.getElementById("fileinput").files[0];
     if (!file) {
         return;
     }
@@ -145,7 +145,7 @@ function readFromFile(file, handler) {
 
 /**
  * Convert and draw to string petri net from JSON format
- * @param {String} pNet - string in JSON format represented petri net
+ * @param {String} pNet - JSON object represented petri net
  */
 function deserializePnet(pNet) {
     paper.clear();
@@ -177,12 +177,21 @@ function getByKey(key) {
     return null;
 }
 
+function getByKeySM(key) {
+    if (key.charAt(0) == "f")
+        return finalStates[key];
+    if (key === KEY_START) 
+        return startState[key];
+    if (key.charAt(0) == "q")
+        return usualStates[key];
+}
+
 function deserializeSMachine(sMachine) {
     paper.clear();
     resetStateMachine();
     sMachine.startState.forEach(function(item) {
         var arr = item.split(",");
-        addStartState(arr[0], +arr[1], +arr[2], +arr[3]);
+        addStartState(arr[0], +arr[1], +arr[2], +arr[3], arr[4]);
     });
     sMachine.usualStates.forEach(function(item) {
         var arr = item.split(",");
@@ -194,7 +203,7 @@ function deserializeSMachine(sMachine) {
     });
     sMachine.arrows.forEach(function(item) {
         var arr = item.split(",");
-        addArrow(getByKey(arr[0]), getByKey(arr[1]));
+        addArrow(getByKeySM(arr[0]), getByKeySM(arr[1]), arr[2]);
     });
     console.log(sMachine);
 }

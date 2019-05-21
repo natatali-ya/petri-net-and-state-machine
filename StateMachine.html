@@ -47,7 +47,9 @@
                     <input type="text" class="form-control-plaintext border rounded mb-1 text-center" id="transitionName" placeholder="Enter transition name">
 
                     <button class="d-block col btn btn-outline-warning mb-1" id="btnRemove">Remove</button>
-                    <button class="d-block col btn btn-outline-warning mb-1" id="btnClearAll">Clear all</button>
+                    <button class="d-block col btn btn-outline-warning mb-5" id="btnClearAll">Clear all</button>
+
+                    <button class="d-block col btn btn-outline-info mb-1" id="btnConvertToPN">Get Petri net</button>
                 </div>
                 <div class="col-10" id="canvas"></div>
                 <div id="toast-start" class="toast ml-auto" role="alert" data-delay="3000" data-autohide="true" style="position: absolute; top: 10; right: 40;">
@@ -83,4 +85,5 @@
         </div>
     </body>
     <script src="js/SM/hendlers.js"></script>
+    <script src="js/converter.js"></script>
 </html>

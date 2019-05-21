@@ -7,6 +7,7 @@ function addStartState(key, x, y, name, isFinal) {
         state = paper.circle(x, y, STATE_RADIUS).attr({ fill: "#FFF", stroke: "#000" });
     }
     state.options = getOptions(x, y, key, name);
+    state.options.isFinal = isFinal;
     state.click(nodeClick);
     state.drag(dragOnMove, dragOnStart, dragOnEnd);
     state.dblclick(dblClick);
@@ -37,7 +38,7 @@ function addFinalState(key, x, y, name) {
     finalStates[key] = finalState;
 }
 
-function addArrow(node1, node2) {
+function addArrow(node1, node2, text) {
     var arrow;
     var node1opt = node1.options;
     var node2opt = node2.options;
@@ -47,7 +48,6 @@ function addArrow(node1, node2) {
             $('#toast-arrow').toast('show');
         } else { // else new arrow        
             if (checkDistance(node1opt.x, node2opt.x, node1opt.y, node2opt.y, STATE_RADIUS)) {
-                var textNewArrow = document.getElementById('transitionName').value;
                 backArrow = checkBackRelation(node1opt.key, node2opt.key);
                 if (!isEmpty(backArrow)) {
                     var textExistsArrow = backArrow.path.text;
@@ -68,20 +68,20 @@ function addArrow(node1, node2) {
                     backArrow.path.click(nodeClick);
 
                     arrow.path = addArrowPath(node1opt.x, node1opt.y, node2opt.x, node2opt.y, -DOUBLE_OFFSET);
-                    arrow.path.text = textNewArrow;
+                    arrow.path.text = text;
                     arrow.path.from = node1;
                     arrow.path.to = node2;
                     arrow.path.doubleOffset = -DOUBLE_OFFSET;
                     arrow.path.keys = [node1opt.key, node2opt.key];
-                    if (textNewArrow) {
+                    if (text) {
                         var coordinates = calcArrowTextCoordinates(node1opt.x, node1opt.y, node2opt.x, node2opt.y, -DOUBLE_OFFSET);
-                        arrow.path.textCaption = drawArrowText(textNewArrow, coordinates.x, coordinates.y);
+                        arrow.path.textCaption = drawArrowText(text, coordinates.x, coordinates.y);
                     }
                     arrow.path.click(nodeClick);
                     arrows.push(arrow);
                 } else {
                     arrow.path = addArrowPath(node1opt.x, node1opt.y, node2opt.x, node2opt.y, 0);
-                    arrow.path.text = textNewArrow;
+                    arrow.path.text = text;
                     arrow.path.from = node1;
                     arrow.path.to = node2;
                     arrow.path.doubleOffset = 0;
@@ -95,6 +95,8 @@ function addArrow(node1, node2) {
                 }
             } 
         }    
+    } else {
+        addItselfArrow(node1, text);
     }
 }
 
@@ -234,7 +236,8 @@ function dragOnEnd(e) {
 function nodeMouseUp(e) {
     if (e.ctrlKey  && tempArrowActive) {
         tempArrow.path.remove();
-        addArrow(tempArrow.from, this);
+        var text = document.getElementById('transitionName').value;
+        addArrow(tempArrow.from, this, text);
     }
 }
 
@@ -298,18 +301,23 @@ function resetStateMachine() {
 }
 
 function dblClick() {
+    var text = document.getElementById('transitionName').value;
+    addItselfArrow(this, text);
+}
+
+function addItselfArrow(node, text) {
     var arrow = {};
-    var x = this.options.x - OFFSET;
-    var y = this.options.y - STATE_RADIUS;
+    var x = node.options.x - OFFSET;
+    var y = node.options.y - STATE_RADIUS;
     arrow.path = paper.path('M' + x + ',' + y + 
         'C' + (x - INCLINE_X) + ',' + (y - INCLINE_Y) + 
         ',' + (x + INCLINE_X + 2 * OFFSET) + ',' + (y - INCLINE_Y) + 
         ',' + (x + 2 * OFFSET) + ',' + y).attr({ "stroke-width": 2, "arrow-end": "block-wide-long" });
-    arrow.path.text = document.getElementById('transitionName').value;
-    arrow.path.from = this;
-    arrow.path.to = this;
+    arrow.path.text = text;
+    arrow.path.from = node;
+    arrow.path.to = node;
     arrow.path.doubleOffset = 0;
-    arrow.path.keys = [this.options.key, this.options.key];
+    arrow.path.keys = [node.options.key, node.options.key];
     if (arrow.path.text) {
         arrow.path.textCaption = drawArrowText(arrow.path.text, x + OFFSET, y - INCLINE_Y + 2 * OFFSET);
     }
