@@ -1,6 +1,9 @@
 function addStartState(key, x, y, name, isFinal) {
     if (!isEmpty(startState)) return;
     var state;
+    if (typeof(isFinal) == 'string') {
+        isFinal = (isFinal === 'true');
+    } 
     if (isFinal) {
         state = paper.rect(x - STATE_WIDTH, y - STATE_WIDTH, 2 * STATE_WIDTH, 2 * STATE_WIDTH).attr({ fill: "#FFF", stroke: "#000" });
     } else {

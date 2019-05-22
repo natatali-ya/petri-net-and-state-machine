@@ -131,3 +131,12 @@ btnConvertToPN.addEventListener("click", function() {
     window.open('PetriNet.html');
     //win.addEventListener('load', deserializePnet(pNet), false);
 });
+
+function loadPage() {
+    var obj = localStorage.getItem("sm");
+    console.log(obj);
+    if (obj) {
+        deserializeSMachine(JSON.parse(obj));
+    }
+    localStorage.clear();
+}
