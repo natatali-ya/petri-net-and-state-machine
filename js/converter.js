@@ -1,23 +1,12 @@
-function covertSmToPn(startState, usualStates, finalStates, arrows) {
+function covertSmToPn(states, arrows) {
     var pNet = { "places": [], "transitions": [], "arrows": [] };
-    var compliances = {};
 
-    for (var key in startState) {
-        var item = startState[key].options;
-        compliances[key] = "p" + pNet.places.length;
-        pNet.places.push("p" + pNet.places.length + "," + item.x + "," + item.y + "," + 1);
+    for (var key in states) {
+        var item = states[key].options;
+        var token = item.key === KEY_START ? 1 : 0;
+        pNet.places.push("p" + item.key.slice(1) + "," + item.x + "," + item.y + "," + token);
     }
-
-    for (var key in usualStates) {
-        var item = usualStates[key].options;
-        compliances[key] = "p" + pNet.places.length;
-        pNet.places.push("p" + pNet.places.length + "," + item.x + "," + item.y + "," + 0);
-    }
-    for (var key in finalStates) {
-        var item = finalStates[key].options;
-        compliances[key] = "p" + pNet.places.length;
-        pNet.places.push("p" + pNet.places.length + "," + item.x + "," + item.y + "," + 0);
-    }
+    
     for (var key in arrows) {
         var item = arrows[key].path;
         var index = "t" + pNet.transitions.length;
@@ -26,8 +15,8 @@ function covertSmToPn(startState, usualStates, finalStates, arrows) {
             centerCoords.x += 100;
         }
         pNet.transitions.push(index + "," + centerCoords.x + "," + centerCoords.y + "," + item.text);
-        pNet.arrows.push(compliances[item.from.options.key] + "," + index + "," + 1);
-        pNet.arrows.push(index + "," + compliances[item.to.options.key] + "," + 1);
+        pNet.arrows.push("p" + item.from.options.key.slice(1) + "," + index + "," + 1);
+        pNet.arrows.push(index + "," + "p" + item.to.options.key.slice(1) + "," + 1);
     }
     return JSON.stringify(pNet);
 }

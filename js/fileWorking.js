@@ -11,7 +11,7 @@
 function saveToFile(file, sign) {
     var text;
     if (sign === "SM") {
-        text = serializeSMachine(startState, usualStates, finalStates, arrows);
+        text = serializeSMachine(states, arrows);
     } else if (sign === "PN") {
         text = serializePnet(places, transitions, arrows);
     }
@@ -41,19 +41,11 @@ function serializePnet(places, transitions, arrows) {
     return JSON.stringify(pNet);
 }
 
-function serializeSMachine(startState, usualStates, finalStates, arrows) {
-    var sMachine = { startState:[], usualStates:[], finalStates:[], arrows:[] };
-    Object.keys(startState).forEach(function(key) {
-        var start = startState[key].options;
-        sMachine.startState.push(start.key + "," + start.x + "," + start.y + "," + start.name + "," + start.isFinal);
-    });
-    Object.keys(usualStates).forEach(function(key) {
-        var state = usualStates[key].options;
-        sMachine.usualStates.push(state.key + "," + state.x + "," + state.y + "," + state.name);
-    });
-    Object.keys(finalStates).forEach(function(key) {
-        var state = finalStates[key].options;
-        sMachine.finalStates.push(state.key + "," + state.x + "," + state.y + "," + state.name);
+function serializeSMachine(states, arrows) {
+    var sMachine = { states:[], arrows:[] };
+    Object.keys(states).forEach(function(key) {
+        var start = states[key].options;
+        sMachine.states.push(start.key + "," + start.x + "," + start.y + "," + start.name + "," + start.isFinal);
     });
     arrows.forEach(function(item) {
         var arrow = item.path;
@@ -178,29 +170,16 @@ function getByKey(key) {
 }
 
 function getByKeySM(key) {
-    if (key.charAt(0) == "f")
-        return finalStates[key];
-    if (key === KEY_START) 
-        return startState[key];
-    if (key.charAt(0) == "q")
-        return usualStates[key];
+    return states[key];
 }
 
 function deserializeSMachine(sMachine) {
     paper.clear();
     resetStateMachine();
     debugger;
-    sMachine.startState.forEach(function(item) {
+    sMachine.states.forEach(function(item) {
         var arr = item.split(",");
-        addStartState(arr[0], +arr[1], +arr[2], +arr[3], arr[4]);
-    });
-    sMachine.usualStates.forEach(function(item) {
-        var arr = item.split(",");
-        addUsualState(arr[0], +arr[1], +arr[2], arr[3]);
-    });
-    sMachine.finalStates.forEach(function(item) {
-        var arr = item.split(",");
-        addFinalState(arr[0], +arr[1], +arr[2], arr[3]);
+        addState(arr[0], +arr[1], +arr[2], arr[3], arr[4]);
     });
     sMachine.arrows.forEach(function(item) {
         var arr = item.split(",");

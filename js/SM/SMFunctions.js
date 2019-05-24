@@ -1,5 +1,5 @@
-function addStartState(key, x, y, name, isFinal) {
-    if (!isEmpty(startState)) return;
+function addState(key, x, y, name, isFinal) {
+    if (key === KEY_START && states[KEY_START]) return;
     var state;
     if (typeof(isFinal) == 'string') {
         isFinal = (isFinal === 'true');
@@ -16,29 +16,7 @@ function addStartState(key, x, y, name, isFinal) {
     state.dblclick(dblClick);
     state.mouseup(nodeMouseUp);
 
-    startState[key] = state;
-}
-
-function addUsualState(key, x, y, name) {
-    var state = paper.circle(x, y, STATE_RADIUS).attr({ fill: "#FFF", stroke: "#000" });
-    state.options = getOptions(x, y, key, name);
-    state.click(nodeClick);
-    state.drag(dragOnMove, dragOnStart, dragOnEnd);
-    state.dblclick(dblClick);
-    state.mouseup(nodeMouseUp);
-
-    usualStates[key] = state;
-}
-
-function addFinalState(key, x, y, name) {
-    var finalState = paper.rect(x - STATE_WIDTH, y - STATE_WIDTH, 2 * STATE_WIDTH, 2 * STATE_WIDTH).attr({ fill: "#FFF", stroke: "#000" });
-    finalState.options = getOptions(x, y, key, name);
-    finalState.click(nodeClick);
-    finalState.drag(dragOnMove, dragOnStart, dragOnEnd);
-    finalState.dblclick(dblClick);
-    finalState.mouseup(nodeMouseUp);
-
-    finalStates[key] = finalState;
+    states[key] = state;
 }
 
 function addArrow(node1, node2, text) {
@@ -201,9 +179,9 @@ function dragOnMove(dx, dy, x, y, e) {
         this.transform(this.currentTransform + "t" + dx + ',' + dy); // moving from Raphael documentation
         this.options.captionKey.remove();
         this.options.captionKey = drawKey(this.options.x + dx, this.options.y + dy, this.options.key); // redraw key
-        if (this.options.text) { // redraw name for transition
-            this.options.captionText.remove();
-            this.options.captionText = drawName(this.options.x + dx, this.options.y + dy, this.options.name);
+        if (this.options.name) { // redraw name for transition
+            this.options.captionName.remove();
+            this.options.captionName = drawName(this.options.x + dx, this.options.y + dy, this.options.name);
         }
         redrawArrows(this, this.options.x + dx, this.options.y + dy);
     } else {
@@ -250,21 +228,9 @@ function removeSelected() {
 
     switch (node.type) {
         case "circle":
-            var key = node.options.key;
-            if (node.options.key == KEY_START) {
-                delete startState[key];
-            } else {
-                delete usualStates[key];
-            }
-            removeNode(node);
-            break;
         case "rect":
             var key = node.options.key;
-            if (node.options.key == KEY_START) {
-                delete startState[key];
-            } else {
-                delete finalStates[key];
-            }
+            delete states[key];
             removeNode(node);
             break;
         case "path":
@@ -296,9 +262,7 @@ function removeNode(node) {
 }
 
 function resetStateMachine() {
-    startState = {};
-    usualStates = {};
-    finalStates = {};
+    states = {};
     arrows = [];
     selected = null;
 }

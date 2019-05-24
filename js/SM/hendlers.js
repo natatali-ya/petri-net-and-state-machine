@@ -9,9 +9,7 @@ var height = window.innerHeight;
 var paper = new Raphael("canvas", width, height);
 
 // Main elements of the Petri net
-var startState = {};
-var usualStates = {};
-var finalStates = {};
+var states = {};
 var arrows = [];
 var selected = null;
 
@@ -74,7 +72,7 @@ btnAddState.addEventListener("click", function() {
     var usual = document.getElementById("usualState");
     var final = document.getElementById("finalState");
     if (start.checked) {
-        if (!isEmpty(startState)) {
+        if (states[KEY_START]) {
             $('#toast-start').toast('show');
         } else {
             $("#mi-modal").modal('show');
@@ -91,19 +89,37 @@ btnAddState.addEventListener("click", function() {
             };
             modalConfirm(function(confirm) {
                 if (confirm) {
-                  addStartState(KEY_START, 100, 100, stateName, true);
+                  addState(KEY_START, 100, 100, stateName, true);
                 } else {
-                  addStartState(KEY_START, 100, 100, stateName, false);
+                  addState(KEY_START, 100, 100, stateName, false);
                 }
             });
         }
     } else if (usual.checked) {
-        addUsualState("q" + (nextIndex(usualStates)), 50, 50, stateName);
-        
+        addState("q" + (nextIndexSM(states)), 50, 50, stateName, false);
     } else if (final.checked) {
-        addFinalState("f" + nextIndex(finalStates), 50, 50, stateName);
+        addState("q" + nextIndexSM(states), 50, 50, stateName, true);
     }
 });
+
+/**
+ * Get next index for adding element
+ * @param {Object} nodes 
+ */
+function nextIndexSM(nodes) {
+    var lastKey = 0;
+    var keys = Object.keys(nodes);
+    var keysLength = keys.length;
+    if (keysLength > 0) {
+        var last = keys[keysLength - 1];
+        if (last === KEY_START) {
+            lastKey = keys[keysLength - 2] && +keys[keysLength - 2].slice(1) || 0 ; // becouse key looks like "p3" or "q2"
+        } else {
+            lastKey = +last.slice(1);
+        }
+    }
+    return lastKey + 1;
+  }
 
 /**
  * Handler for clicking the Remove (selected) button
@@ -123,13 +139,11 @@ btnClearAll.addEventListener("click", function() {
 
 btnConvertToPN.addEventListener("click", function() {
     localStorage.clear();
-    var pNet = covertSmToPn(startState, usualStates, finalStates, arrows);
-    console.log(pNet);
+    var pNet = covertSmToPn(states, arrows);
 
     // Запишем в localStorage с ключём object
     localStorage.setItem("object", pNet);
     window.open('PetriNet.html');
-    //win.addEventListener('load', deserializePnet(pNet), false);
 });
 
 function loadPage() {
