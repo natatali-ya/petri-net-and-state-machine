@@ -1,4 +1,4 @@
-# Petri net and Statemachine editor
+# Petri net and State machine editor
 Editor for building State machines and Petri net. 
 It is possible to convert State machines to Petri net.
 Implemented operations on State machines: 
