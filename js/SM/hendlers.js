@@ -17,6 +17,7 @@ var selected = null;
 var tempArrow = { from: null, x: 0, y: 0, path: null };
 var tempArrowActive = false;
 var textFile = null; // need to manually revoke the object URL to avoid memory leaks
+var newLastIndex = 0;
 
 // constants
 var STATE_RADIUS = 30;
@@ -72,7 +73,7 @@ btnAddState.addEventListener("click", function() {
     var usual = document.getElementById("usualState");
     var final = document.getElementById("finalState");
     if (start.checked) {
-        if (states[KEY_START]) {
+        if (states[KEY_START] || states[KEY_START + "-" + KEY_START] || states[KEY_START + "-"] || states["-" + KEY_START]) {
             $('#toast-start').toast('show');
         } else {
             $("#mi-modal").modal('show');
@@ -111,6 +112,10 @@ function nextIndexSM(nodes) {
     var keys = Object.keys(nodes);
     var keysLength = keys.length;
     if (keysLength > 0) {
+        if (states[KEY_START + "-" + KEY_START] || states[KEY_START + "-"] || states["-" + KEY_START]) {
+            newLastIndex ++;
+            return newLastIndex;
+        }
         var last = keys[keysLength - 1];
         if (last === KEY_START) {
             lastKey = keys[keysLength - 2] && +keys[keysLength - 2].slice(1) || 0 ; // becouse key looks like "p3" or "q2"
@@ -148,7 +153,6 @@ btnConvertToPN.addEventListener("click", function() {
 
 function loadPage() {
     var obj = localStorage.getItem("sm");
-    console.log(obj);
     if (obj) {
         deserializeSMachine(JSON.parse(obj));
     }

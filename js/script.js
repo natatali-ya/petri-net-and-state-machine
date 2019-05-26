@@ -61,19 +61,11 @@ btnSave.addEventListener("click", function() {
     saveToFile("petriNet.txt", "PN");
 });
 
-// btnRun.addEventListener("click", function() {
-//     //TODO
-// });
-
-// btnStop.addEventListener("click", function() {
-//     //TODO
-// });
-
 /**
  * Handler for clicking the Add place button
  */
 btnAddPlace.addEventListener("click", function() {
-    addPlace("p" + nextIndex(places), 50, 50, 0);
+    addPlace("p" + nextIndex(places, true), 50, 50, 0);
 });
 
 /**

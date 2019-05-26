@@ -28,53 +28,60 @@ function addArrow(node1, node2, text) {
         if (!isEmpty(arrow)) { // if such arrow exists
             $('#toast-arrow').toast('show');
         } else { // else new arrow        
-            if (checkDistance(node1opt.x, node2opt.x, node1opt.y, node2opt.y, STATE_RADIUS)) {
-                backArrow = checkBackRelation(node1opt.key, node2opt.key);
-                if (!isEmpty(backArrow)) {
-                    var textExistsArrow = backArrow.path.text;
-                    if (textExistsArrow) {
-                        backArrow.path.textCaption.remove();
-                    }
-                    backArrow.path.remove();
-                    backArrow.path = addArrowPath(node2opt.x, node2opt.y, node1opt.x, node1opt.y, DOUBLE_OFFSET);
-                    backArrow.path.text = textExistsArrow;
-                    backArrow.path.from = node2;
-                    backArrow.path.to = node1;
-                    backArrow.path.doubleOffset = DOUBLE_OFFSET;
-                    backArrow.path.keys = [node2opt.key, node1opt.key];
-                    if (textExistsArrow) {
-                        var coordinates = calcArrowTextCoordinates(node1opt.x, node1opt.y, node2opt.x, node2opt.y, DOUBLE_OFFSET);
-                        backArrow.path.textCaption = drawArrowText(textExistsArrow, coordinates.x, coordinates.y);
-                    }
-                    backArrow.path.click(nodeClick);
-
-                    arrow.path = addArrowPath(node1opt.x, node1opt.y, node2opt.x, node2opt.y, -DOUBLE_OFFSET);
-                    arrow.path.text = text;
-                    arrow.path.from = node1;
-                    arrow.path.to = node2;
-                    arrow.path.doubleOffset = -DOUBLE_OFFSET;
-                    arrow.path.keys = [node1opt.key, node2opt.key];
-                    if (text) {
-                        var coordinates = calcArrowTextCoordinates(node1opt.x, node1opt.y, node2opt.x, node2opt.y, -DOUBLE_OFFSET);
-                        arrow.path.textCaption = drawArrowText(text, coordinates.x, coordinates.y);
-                    }
-                    arrow.path.click(nodeClick);
-                    arrows.push(arrow);
-                } else {
-                    arrow.path = addArrowPath(node1opt.x, node1opt.y, node2opt.x, node2opt.y, 0);
-                    arrow.path.text = text;
-                    arrow.path.from = node1;
-                    arrow.path.to = node2;
-                    arrow.path.doubleOffset = 0;
-                    arrow.path.keys = [node1opt.key, node2opt.key];
-                    if (arrow.path.text) {
-                        var coordinates = calcArrowTextCoordinates(node1opt.x, node1opt.y, node2opt.x, node2opt.y, 6);
-                        arrow.path.textCaption = drawArrowText(arrow.path.text, coordinates.x, coordinates.y);
-                    }
-                    arrow.path.click(nodeClick);
-                    arrows.push(arrow);
+            backArrow = checkBackRelation(node1opt.key, node2opt.key);
+            if (!isEmpty(backArrow)) {
+                var textExistsArrow = backArrow.path.text;
+                if (textExistsArrow) {
+                    backArrow.path.textCaption.remove();
                 }
-            } 
+                backArrow.path.remove();
+                backArrow.path = addArrowPath(node2opt.x, node2opt.y, node1opt.x, node1opt.y, DOUBLE_OFFSET);
+                backArrow.path.text = textExistsArrow;
+                backArrow.path.from = node2;
+                backArrow.path.to = node1;
+                backArrow.path.doubleOffset = DOUBLE_OFFSET;
+                backArrow.path.keys = [node2opt.key, node1opt.key];
+                if (textExistsArrow) {
+                    var coordinates = calcArrowTextCoordinates(node1opt.x, node1opt.y, node2opt.x, node2opt.y, DOUBLE_OFFSET);
+                    backArrow.path.textCaption = drawArrowText(textExistsArrow, coordinates.x, coordinates.y);
+                }
+                backArrow.path.click(nodeClick);
+
+                arrow.path = addArrowPath(node1opt.x, node1opt.y, node2opt.x, node2opt.y, -DOUBLE_OFFSET);
+                arrow.path.text = text;
+                arrow.path.from = node1;
+                arrow.path.to = node2;
+                arrow.path.doubleOffset = -DOUBLE_OFFSET;
+                arrow.path.keys = [node1opt.key, node2opt.key];
+                if (text) {
+                    var coordinates = calcArrowTextCoordinates(node1opt.x, node1opt.y, node2opt.x, node2opt.y, -DOUBLE_OFFSET);
+                    if (checkDistance(node1opt.x, node2opt.x, node1opt.y, node2opt.y, STATE_RADIUS)) {
+                        arrow.path.textCaption = drawArrowText(text, coordinates.x, coordinates.y);
+                    } else {
+                        arrow.path.textCaption = drawArrowText("", coordinates.x, coordinates.y);
+                    }
+                }
+                arrow.path.click(nodeClick);
+                arrows.push(arrow);
+            } else {
+                arrow.path = addArrowPath(node1opt.x, node1opt.y, node2opt.x, node2opt.y, 0);
+                arrow.path.text = text;
+                arrow.path.from = node1;
+                arrow.path.to = node2;
+                arrow.path.doubleOffset = 0;
+                arrow.path.keys = [node1opt.key, node2opt.key];
+                if (arrow.path.text) {
+                    var coordinates = calcArrowTextCoordinates(node1opt.x, node1opt.y, node2opt.x, node2opt.y, 6);
+                    if (checkDistance(node1opt.x, node2opt.x, node1opt.y, node2opt.y, STATE_RADIUS)) {
+                        arrow.path.textCaption = drawArrowText(arrow.path.text, coordinates.x, coordinates.y);
+                    } else {
+                        arrow.path.textCaption = drawArrowText("", coordinates.x, coordinates.y);
+                    }
+                    
+                }
+                arrow.path.click(nodeClick);
+                arrows.push(arrow);
+            }
         }    
     } else {
         addItselfArrow(node1, text);
@@ -248,7 +255,7 @@ function removeNode(node) {
     for (var i = arrows.length - 1; i >= 0; i--) {
         if (arrows[i].path.from.options.key === key || arrows[i].path.to.options.key === key) {
             if (arrows[i].path.text) {
-                arrows[i].path.text.remove();
+                arrows[i].path.textCaption.remove();
             }
             arrows[i].path.remove();
             arrows.splice(i, 1);

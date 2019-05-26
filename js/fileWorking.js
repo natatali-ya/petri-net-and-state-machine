@@ -176,7 +176,6 @@ function getByKeySM(key) {
 function deserializeSMachine(sMachine) {
     paper.clear();
     resetStateMachine();
-    debugger;
     sMachine.states.forEach(function(item) {
         var arr = item.split(",");
         addState(arr[0], +arr[1], +arr[2], arr[3], arr[4]);
