@@ -78,7 +78,7 @@ function removeNode(node) {
  */
 function removeArrow(key1, key2) {
     for (var i = arrows.length - 1; i >= 0; i--) {
-        if((arrows[i].path.from.key == key1 && arrows[i].path.to.key == key2) || (arrows[i].path.from.key == key2 && arrows[i].path.to.key == key1)) {
+        if((arrows[i].path.from.key == key1 && arrows[i].path.to.key == key2)) {
             arrows[i].path.remove();
             arrows.splice(i, 1);
         }
@@ -176,53 +176,73 @@ function addArrow(node1, node2) {
             var xFrom = arrow.path.attrs.path[0][1];
             var yFrom = arrow.path.attrs.path[0][2];
             arrow.path.text = drawCount(arrow.path.count, xFrom, yFrom, xTo, yTo, node1.type);
-        } else {         
-            if (!((Math.abs(node1.x - node2.x) <= 2*PLACE_RADIUS + 10) && (Math.abs(node1.y - node2.y) <= 2*PLACE_RADIUS + 10))) {
-                arrow.path = addArrowPath(node1.x, node1.y, node2.x, node2.y, node1.type);
-                arrow.path.count = 1;
-                arrow.path.from = node1;
-                arrow.path.to = node2;
-                arrow.path.keys = [node1.key, node2.key];
-                arrow.path.click(nodeClick);
-                arrows.push(arrow);
-            } 
+        } else {
+            var backArrow = checkBackRelationPN(node1.key, node2.key);     
+            if (!isEmpty(backArrow)) {
+                var backCount = backArrow.path.count;
+                if (backArrow.path.text) {
+                    backArrow.path.text.remove();
+                }
+                backArrow.path.remove();
+                backArrow.path = addArrowPath(node2.x, node2.y, node1.x, node1.y, -DOUBLE_OFFSET);
+                backArrow.path.doubleOffset = -DOUBLE_OFFSET;
+                backArrow.path.count = backCount;
+                backArrow.path.from = node2;
+                backArrow.path.to = node1;
+                backArrow.path.keys = [node2.key, node1.key];
+                backArrow.path.click(nodeClick);
+                if (backCount > 1) {
+                    backArrow.path.text = drawCount(backArrow.path.count, node2.x, node2.y, node1.x, node1.y, node1.type);
+                }
+                arrow.path = addArrowPath(node1.x, node1.y, node2.x, node2.y, DOUBLE_OFFSET);
+                arrow.path.doubleOffset = DOUBLE_OFFSET;
+            } else {
+                arrow.path = addArrowPath(node1.x, node1.y, node2.x, node2.y, 0);
+                arrow.path.doubleOffset = 0;
+            }
+            arrow.path.count = 1;
+            arrow.path.from = node1;
+            arrow.path.to = node2;
+            arrow.path.keys = [node1.key, node2.key];
+            arrow.path.click(nodeClick);
+            arrows.push(arrow);
         }    
     }
     return arrow;
 }
 
-function addArrowPath(xFrom, yFrom, xTo, yTo, startType) {
+function checkBackRelationPN(key1, key2) {
+    var arr = {};
+    arrows.forEach(function(arrow) {
+        if (arrow.path.from.key == key2 && arrow.path.to.key == key1) {
+            arr = arrow;
+        }
+    });
+    return arr;
+  }
+
+function addArrowPath(xFrom, yFrom, xTo, yTo, doubleOffset) {
     var path = {};
     if ((Math.abs(xFrom - xTo) <= 2*PLACE_RADIUS + 10) && (Math.abs(yFrom - yTo) <= 2*PLACE_RADIUS + 10)) {
         path = paper.path("M" + xFrom + "," + yFrom + "L" + xFrom + "," + yFrom).attr({ "stroke": "black"}); // fictitious-empty arrow
     } else {
         var attrPath = { "stroke": "black", "stroke-width": 2, "arrow-end": "block-wide-long" };
-        var x = Math.abs(xFrom - xTo);
-        var y = Math.abs(yFrom - yTo);
-        var distance = Math.sqrt(x*x + y*y);
-        var k = distance / PLACE_RADIUS;
-        var xOffxet = x / k || 0;
-        var yOffset = y / k || 0;
-
-        var doubleOffset;
-        if (startType === "circle") {
-            doubleOffset = 6;
-        } else {
-            doubleOffset = -6;
-        }
+        var offset = calcOffset(xFrom, xTo, yFrom, yTo, PLACE_RADIUS);
         if (xFrom < xTo) {
-            if (yFrom < yTo) {
-                path = paper.path("M" + (xFrom + xOffxet) + "," + (yFrom + yOffset + doubleOffset) + "L" + (xTo - xOffxet) + "," + (yTo - yOffset + doubleOffset)).attr(attrPath);
-            } else {
-                path = paper.path("M" + (xFrom + xOffxet) + "," + (yFrom - yOffset + doubleOffset) + "L" + (xTo - xOffxet) + "," + (yTo + yOffset + doubleOffset)).attr(attrPath);
-            }
+            xFrom = xFrom + offset.x;
+            xTo = xTo - offset.x;
         } else {
-            if (yFrom < yTo) {
-                path = paper.path("M" + (xFrom - xOffxet) + "," + (yFrom + yOffset + doubleOffset) + "L" + (xTo + xOffxet) + "," + (yTo - yOffset + doubleOffset)).attr(attrPath);
-            } else {
-                path = paper.path("M" + (xFrom - xOffxet) + "," + (yFrom - yOffset + doubleOffset) + "L" + (xTo + xOffxet) + "," + (yTo + yOffset + doubleOffset)).attr(attrPath);
-            }
+            xFrom = xFrom - offset.x;
+            xTo = xTo + offset.x;
         }
+        if (yFrom < yTo) {             
+            yFrom = yFrom + offset.y + doubleOffset;
+            yTo = yTo - offset.y + doubleOffset;
+        } else {
+            yFrom = yFrom - offset.y + doubleOffset;             
+            yTo = yTo + offset.y + doubleOffset;
+        }
+        path = paper.path("M" + xFrom + "," + yFrom + "L" + xTo + "," + yTo).attr(attrPath);
     }
     return path;
 }
@@ -522,13 +542,15 @@ function redrawArrows(node, x, y) {
             var arrowFrom = arrow.path.from;
             var arrowCount = arrow.path.count;
             var arrowKeys = arrow.path.keys;
+            var doubleOffset = arrow.path.doubleOffset;
             if (arrow.path.text) {
                 arrow.path.text.remove();
             }
             arrow.path.remove();
-            arrow.path = addArrowPath(x, y, arrowTo.x, arrowTo.y, node.type);
+            arrow.path = addArrowPath(x, y, arrowTo.x, arrowTo.y, doubleOffset);
             arrow.path.from = arrowFrom;
             arrow.path.to = arrowTo;
+            arrow.path.doubleOffset = doubleOffset;
             arrow.path.count = arrowCount;
             arrow.path.keys = arrowKeys;
             if ((Math.abs(x - arrowTo.x) <= 2*PLACE_RADIUS + 10) && (Math.abs(y - arrowTo.y) <= 2*PLACE_RADIUS + 10)) {
@@ -547,13 +569,15 @@ function redrawArrows(node, x, y) {
             var arrowFrom = arrow.path.from;
             var arrowCount = arrow.path.count;
             var arrowKeys = arrow.path.keys;
+            var doubleOffset = arrow.path.doubleOffset;
             if (arrow.path.text) {
                 arrow.path.text.remove();
             }
             arrow.path.remove();
-            arrow.path = addArrowPath(arrowFrom.x, arrowFrom.y, x, y, arrowFrom.type);
+            arrow.path = addArrowPath(arrowFrom.x, arrowFrom.y, x, y, doubleOffset);
             arrow.path.from = arrowFrom;
             arrow.path.to = arrowTo;
+            arrow.path.doubleOffset = doubleOffset;
             arrow.path.count = arrowCount;
             arrow.path.keys = arrowKeys;
             if ((Math.abs(arrowFrom.x - x) <= 2*PLACE_RADIUS + 10) && (Math.abs(arrowFrom.y - y) <= 2*PLACE_RADIUS + 10)) {

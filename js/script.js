@@ -26,6 +26,7 @@ var TRANSITION_HEIGHT = 60;
 var TRANSITION_WIDTH = 20;
 var OFFSET = 5;
 var SELECTION_ARROW_HEIGHT = 8;
+var DOUBLE_OFFSET = 6;
 
 /**
  * Clicking outside the element. Clearing selection
@@ -112,7 +113,6 @@ btnClearAll.addEventListener("click", function() {
 
 function loadPage() {
     var obj = localStorage.getItem("object");
-    console.log(obj);
     if (obj) {
         deserializePnet(JSON.parse(obj));
     }

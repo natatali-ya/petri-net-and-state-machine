@@ -312,7 +312,7 @@ function redrawItselfArrow(node, text, x, y) {
     arrow.path.doubleOffset = 0;
     arrow.path.keys = [node.options.key, node.options.key];
     if (text) {
-        arrow.path.textCaption = paper.text(x + OFFSET, y - INCLINE_Y + 2 * OFFSET, text);
+        arrow.path.textCaption = drawArrowText(text, x + OFFSET, y - INCLINE_Y + 2 * OFFSET);
     }
     arrow.path.click(nodeClick);
     return arrow.path;
