@@ -1,5 +1,5 @@
-function addStartState(key, x, y, name, isFinal) {
-    if (!isEmpty(startState)) return;
+function addState(key, x, y, name, isFinal) {
+    if (key === KEY_START && states[KEY_START]) return;
     var state;
     if (typeof(isFinal) == 'string') {
         isFinal = (isFinal === 'true');
@@ -16,29 +16,7 @@ function addStartState(key, x, y, name, isFinal) {
     state.dblclick(dblClick);
     state.mouseup(nodeMouseUp);
 
-    startState[key] = state;
-}
-
-function addUsualState(key, x, y, name) {
-    var state = paper.circle(x, y, STATE_RADIUS).attr({ fill: "#FFF", stroke: "#000" });
-    state.options = getOptions(x, y, key, name);
-    state.click(nodeClick);
-    state.drag(dragOnMove, dragOnStart, dragOnEnd);
-    state.dblclick(dblClick);
-    state.mouseup(nodeMouseUp);
-
-    usualStates[key] = state;
-}
-
-function addFinalState(key, x, y, name) {
-    var finalState = paper.rect(x - STATE_WIDTH, y - STATE_WIDTH, 2 * STATE_WIDTH, 2 * STATE_WIDTH).attr({ fill: "#FFF", stroke: "#000" });
-    finalState.options = getOptions(x, y, key, name);
-    finalState.click(nodeClick);
-    finalState.drag(dragOnMove, dragOnStart, dragOnEnd);
-    finalState.dblclick(dblClick);
-    finalState.mouseup(nodeMouseUp);
-
-    finalStates[key] = finalState;
+    states[key] = state;
 }
 
 function addArrow(node1, node2, text) {
@@ -50,53 +28,60 @@ function addArrow(node1, node2, text) {
         if (!isEmpty(arrow)) { // if such arrow exists
             $('#toast-arrow').toast('show');
         } else { // else new arrow        
-            if (checkDistance(node1opt.x, node2opt.x, node1opt.y, node2opt.y, STATE_RADIUS)) {
-                backArrow = checkBackRelation(node1opt.key, node2opt.key);
-                if (!isEmpty(backArrow)) {
-                    var textExistsArrow = backArrow.path.text;
-                    if (textExistsArrow) {
-                        backArrow.path.textCaption.remove();
-                    }
-                    backArrow.path.remove();
-                    backArrow.path = addArrowPath(node2opt.x, node2opt.y, node1opt.x, node1opt.y, DOUBLE_OFFSET);
-                    backArrow.path.text = textExistsArrow;
-                    backArrow.path.from = node2;
-                    backArrow.path.to = node1;
-                    backArrow.path.doubleOffset = DOUBLE_OFFSET;
-                    backArrow.path.keys = [node2opt.key, node1opt.key];
-                    if (textExistsArrow) {
-                        var coordinates = calcArrowTextCoordinates(node1opt.x, node1opt.y, node2opt.x, node2opt.y, DOUBLE_OFFSET);
-                        backArrow.path.textCaption = drawArrowText(textExistsArrow, coordinates.x, coordinates.y);
-                    }
-                    backArrow.path.click(nodeClick);
-
-                    arrow.path = addArrowPath(node1opt.x, node1opt.y, node2opt.x, node2opt.y, -DOUBLE_OFFSET);
-                    arrow.path.text = text;
-                    arrow.path.from = node1;
-                    arrow.path.to = node2;
-                    arrow.path.doubleOffset = -DOUBLE_OFFSET;
-                    arrow.path.keys = [node1opt.key, node2opt.key];
-                    if (text) {
-                        var coordinates = calcArrowTextCoordinates(node1opt.x, node1opt.y, node2opt.x, node2opt.y, -DOUBLE_OFFSET);
-                        arrow.path.textCaption = drawArrowText(text, coordinates.x, coordinates.y);
-                    }
-                    arrow.path.click(nodeClick);
-                    arrows.push(arrow);
-                } else {
-                    arrow.path = addArrowPath(node1opt.x, node1opt.y, node2opt.x, node2opt.y, 0);
-                    arrow.path.text = text;
-                    arrow.path.from = node1;
-                    arrow.path.to = node2;
-                    arrow.path.doubleOffset = 0;
-                    arrow.path.keys = [node1opt.key, node2opt.key];
-                    if (arrow.path.text) {
-                        var coordinates = calcArrowTextCoordinates(node1opt.x, node1opt.y, node2opt.x, node2opt.y, 6);
-                        arrow.path.textCaption = drawArrowText(arrow.path.text, coordinates.x, coordinates.y);
-                    }
-                    arrow.path.click(nodeClick);
-                    arrows.push(arrow);
+            backArrow = checkBackRelation(node1opt.key, node2opt.key);
+            if (!isEmpty(backArrow)) {
+                var textExistsArrow = backArrow.path.text;
+                if (textExistsArrow) {
+                    backArrow.path.textCaption.remove();
                 }
-            } 
+                backArrow.path.remove();
+                backArrow.path = addArrowPath(node2opt.x, node2opt.y, node1opt.x, node1opt.y, DOUBLE_OFFSET);
+                backArrow.path.text = textExistsArrow;
+                backArrow.path.from = node2;
+                backArrow.path.to = node1;
+                backArrow.path.doubleOffset = DOUBLE_OFFSET;
+                backArrow.path.keys = [node2opt.key, node1opt.key];
+                if (textExistsArrow) {
+                    var coordinates = calcArrowTextCoordinates(node1opt.x, node1opt.y, node2opt.x, node2opt.y, DOUBLE_OFFSET);
+                    backArrow.path.textCaption = drawArrowText(textExistsArrow, coordinates.x, coordinates.y);
+                }
+                backArrow.path.click(nodeClick);
+
+                arrow.path = addArrowPath(node1opt.x, node1opt.y, node2opt.x, node2opt.y, -DOUBLE_OFFSET);
+                arrow.path.text = text;
+                arrow.path.from = node1;
+                arrow.path.to = node2;
+                arrow.path.doubleOffset = -DOUBLE_OFFSET;
+                arrow.path.keys = [node1opt.key, node2opt.key];
+                if (text) {
+                    var coordinates = calcArrowTextCoordinates(node1opt.x, node1opt.y, node2opt.x, node2opt.y, -DOUBLE_OFFSET);
+                    if (checkDistance(node1opt.x, node2opt.x, node1opt.y, node2opt.y, STATE_RADIUS)) {
+                        arrow.path.textCaption = drawArrowText(text, coordinates.x, coordinates.y);
+                    } else {
+                        arrow.path.textCaption = drawArrowText("", coordinates.x, coordinates.y);
+                    }
+                }
+                arrow.path.click(nodeClick);
+                arrows.push(arrow);
+            } else {
+                arrow.path = addArrowPath(node1opt.x, node1opt.y, node2opt.x, node2opt.y, 0);
+                arrow.path.text = text;
+                arrow.path.from = node1;
+                arrow.path.to = node2;
+                arrow.path.doubleOffset = 0;
+                arrow.path.keys = [node1opt.key, node2opt.key];
+                if (arrow.path.text) {
+                    var coordinates = calcArrowTextCoordinates(node1opt.x, node1opt.y, node2opt.x, node2opt.y, 6);
+                    if (checkDistance(node1opt.x, node2opt.x, node1opt.y, node2opt.y, STATE_RADIUS)) {
+                        arrow.path.textCaption = drawArrowText(arrow.path.text, coordinates.x, coordinates.y);
+                    } else {
+                        arrow.path.textCaption = drawArrowText("", coordinates.x, coordinates.y);
+                    }
+                    
+                }
+                arrow.path.click(nodeClick);
+                arrows.push(arrow);
+            }
         }    
     } else {
         addItselfArrow(node1, text);
@@ -201,9 +186,9 @@ function dragOnMove(dx, dy, x, y, e) {
         this.transform(this.currentTransform + "t" + dx + ',' + dy); // moving from Raphael documentation
         this.options.captionKey.remove();
         this.options.captionKey = drawKey(this.options.x + dx, this.options.y + dy, this.options.key); // redraw key
-        if (this.options.text) { // redraw name for transition
-            this.options.captionText.remove();
-            this.options.captionText = drawName(this.options.x + dx, this.options.y + dy, this.options.name);
+        if (this.options.name) { // redraw name for transition
+            this.options.captionName.remove();
+            this.options.captionName = drawName(this.options.x + dx, this.options.y + dy, this.options.name);
         }
         redrawArrows(this, this.options.x + dx, this.options.y + dy);
     } else {
@@ -250,21 +235,9 @@ function removeSelected() {
 
     switch (node.type) {
         case "circle":
-            var key = node.options.key;
-            if (node.options.key == KEY_START) {
-                delete startState[key];
-            } else {
-                delete usualStates[key];
-            }
-            removeNode(node);
-            break;
         case "rect":
             var key = node.options.key;
-            if (node.options.key == KEY_START) {
-                delete startState[key];
-            } else {
-                delete finalStates[key];
-            }
+            delete states[key];
             removeNode(node);
             break;
         case "path":
@@ -282,7 +255,7 @@ function removeNode(node) {
     for (var i = arrows.length - 1; i >= 0; i--) {
         if (arrows[i].path.from.options.key === key || arrows[i].path.to.options.key === key) {
             if (arrows[i].path.text) {
-                arrows[i].path.text.remove();
+                arrows[i].path.textCaption.remove();
             }
             arrows[i].path.remove();
             arrows.splice(i, 1);
@@ -296,9 +269,7 @@ function removeNode(node) {
 }
 
 function resetStateMachine() {
-    startState = {};
-    usualStates = {};
-    finalStates = {};
+    states = {};
     arrows = [];
     selected = null;
 }
@@ -341,7 +312,7 @@ function redrawItselfArrow(node, text, x, y) {
     arrow.path.doubleOffset = 0;
     arrow.path.keys = [node.options.key, node.options.key];
     if (text) {
-        arrow.path.textCaption = paper.text(x + OFFSET, y - INCLINE_Y + 2 * OFFSET, text);
+        arrow.path.textCaption = drawArrowText(text, x + OFFSET, y - INCLINE_Y + 2 * OFFSET);
     }
     arrow.path.click(nodeClick);
     return arrow.path;

@@ -26,6 +26,7 @@ var TRANSITION_HEIGHT = 60;
 var TRANSITION_WIDTH = 20;
 var OFFSET = 5;
 var SELECTION_ARROW_HEIGHT = 8;
+var DOUBLE_OFFSET = 6;
 
 /**
  * Clicking outside the element. Clearing selection
@@ -61,19 +62,11 @@ btnSave.addEventListener("click", function() {
     saveToFile("petriNet.txt", "PN");
 });
 
-// btnRun.addEventListener("click", function() {
-//     //TODO
-// });
-
-// btnStop.addEventListener("click", function() {
-//     //TODO
-// });
-
 /**
  * Handler for clicking the Add place button
  */
 btnAddPlace.addEventListener("click", function() {
-    addPlace("p" + nextIndex(places), 50, 50, 0);
+    addPlace("p" + nextIndex(places, true), 50, 50, 0);
 });
 
 /**
@@ -120,7 +113,6 @@ btnClearAll.addEventListener("click", function() {
 
 function loadPage() {
     var obj = localStorage.getItem("object");
-    console.log(obj);
     if (obj) {
         deserializePnet(JSON.parse(obj));
     }

@@ -6,18 +6,11 @@
         <script src="lib/jquery-3.4.1.min.js"></script>
         <script src="lib/bootstrap.min.js"></script>
         <script src="js/fileWorking.js"></script>
+        <script src="js/common.js"></script>
     </head>
     <body>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <a class="navbar-brand" href="index.html">State machine & Perti net</a>
-            <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link" href="About.html">About</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="Contact.html">Contacts</a>
-                </li>
-            </ul>
         </nav>
         <div class="container" id="sm-form">
             <h4 class="display-5 mt-4 ">1. Download State machines</h4>
@@ -28,15 +21,14 @@
                     <div class="invalid-feedback">No file downloaded</div>
                 </div>
                 <div class="custom-file mb-4 mt-2">
-                    <input type="file" class="custom-file-input" id="secondSM" required>
+                    <input type="file" class="custom-file-input" id="secondSM">
                     <label class="custom-file-label" for="secondSM">Choose second file...</label>
-                    <div class="invalid-feedback">No file downloaded</div>
                 </div>
                 <h4 class="display-5 mt-4 mb-4">2. Select operation</h4>
                 <div class="form-group mt-2">
                     <select class="custom-select"  id="operation" required>
                         <option value="">Open this select menu</option>
-                        <option value="1">Addition</option>
+                        <option value="1">Complement</option>
                         <option value="2">Union</option>
                         <option value="3">Intersection</option>
                     </select>

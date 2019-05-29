@@ -1,23 +1,20 @@
-function covertSmToPn(startState, usualStates, finalStates, arrows) {
+function covertSmToPn(states, arrows) {
     var pNet = { "places": [], "transitions": [], "arrows": [] };
-    var compliances = {};
-
-    for (var key in startState) {
-        var item = startState[key].options;
-        compliances[key] = "p" + pNet.places.length;
-        pNet.places.push("p" + pNet.places.length + "," + item.x + "," + item.y + "," + 1);
+    var matching = {};
+    for (var key in states) {
+        var item = states[key].options;
+        var token = item.key === (KEY_START + "-" + KEY_START || KEY_START + "-" || "-" + KEY_STAR) ? 1 : 0; 
+        var itemKey = item.key.split("");
+        for (var i = 0; i < itemKey.length; i++) {
+            if (itemKey[i] == 'q') {
+                itemKey[i] = 'p';
+            }
+        }
+        var newKey = itemKey.join("");
+        matching[item.key] = newKey;
+        pNet.places.push(newKey + "," + item.x + "," + item.y + "," + token);
     }
-
-    for (var key in usualStates) {
-        var item = usualStates[key].options;
-        compliances[key] = "p" + pNet.places.length;
-        pNet.places.push("p" + pNet.places.length + "," + item.x + "," + item.y + "," + 0);
-    }
-    for (var key in finalStates) {
-        var item = finalStates[key].options;
-        compliances[key] = "p" + pNet.places.length;
-        pNet.places.push("p" + pNet.places.length + "," + item.x + "," + item.y + "," + 0);
-    }
+    
     for (var key in arrows) {
         var item = arrows[key].path;
         var index = "t" + pNet.transitions.length;
@@ -26,8 +23,8 @@ function covertSmToPn(startState, usualStates, finalStates, arrows) {
             centerCoords.x += 100;
         }
         pNet.transitions.push(index + "," + centerCoords.x + "," + centerCoords.y + "," + item.text);
-        pNet.arrows.push(compliances[item.from.options.key] + "," + index + "," + 1);
-        pNet.arrows.push(index + "," + compliances[item.to.options.key] + "," + 1);
+        pNet.arrows.push(matching[item.from.options.key] + "," + index + "," + 1);
+        pNet.arrows.push(index + "," + matching[item.to.options.key] + "," + 1);
     }
     return JSON.stringify(pNet);
 }
