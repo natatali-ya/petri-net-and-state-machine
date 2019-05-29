@@ -25,6 +25,7 @@ function covertSmToPn(states, arrows) {
         pNet.transitions.push(index + "," + centerCoords.x + "," + centerCoords.y + "," + item.text);
         pNet.arrows.push(matching[item.from.options.key] + "," + index + "," + 1);
         pNet.arrows.push(index + "," + matching[item.to.options.key] + "," + 1);
+
     }
     return JSON.stringify(pNet);
 }
