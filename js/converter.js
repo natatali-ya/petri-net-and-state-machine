@@ -3,16 +3,9 @@ function covertSmToPn(states, arrows) {
     var matching = {};
     for (var key in states) {
         var item = states[key].options;
-        var token = item.key === (KEY_START + "-" + KEY_START || KEY_START + "-" || "-" + KEY_STAR) ? 1 : 0; 
-        var itemKey = item.key.split("");
-        for (var i = 0; i < itemKey.length; i++) {
-            if (itemKey[i] == 'q') {
-                itemKey[i] = 'p';
-            }
-        }
-        var newKey = itemKey.join("");
-        matching[item.key] = newKey;
-        pNet.places.push(newKey + "," + item.x + "," + item.y + "," + token);
+        var token = item.key === KEY_START ? 1 : 0; 
+        var itemKey = item.key.slice(1);
+        pNet.places.push("p" + itemKey + "," + item.x + "," + item.y + "," + token);
     }
     
     for (var key in arrows) {
@@ -23,8 +16,8 @@ function covertSmToPn(states, arrows) {
             centerCoords.x += 100;
         }
         pNet.transitions.push(index + "," + centerCoords.x + "," + centerCoords.y + "," + item.text);
-        pNet.arrows.push(matching[item.from.options.key] + "," + index + "," + 1);
-        pNet.arrows.push(index + "," + matching[item.to.options.key] + "," + 1);
+        pNet.arrows.push("p" + item.from.options.key.slice(1) + "," + index + "," + 1);
+        pNet.arrows.push(index + "," + "p" + item.to.options.key.slice(1) + "," + 1);
 
     }
     return JSON.stringify(pNet);

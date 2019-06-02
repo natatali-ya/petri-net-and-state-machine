@@ -66,7 +66,7 @@ btnSave.addEventListener("click", function() {
  * Handler for clicking the Add place button
  */
 btnAddPlace.addEventListener("click", function() {
-    addPlace("p" + nextIndex(places, true), 50, 50, 0);
+    addPlace("p" + nextIndex(places), 50, 50, 0);
 });
 
 /**
